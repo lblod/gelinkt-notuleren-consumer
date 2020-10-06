@@ -1,0 +1,19 @@
+{
+  "name": "gelinkt-notuleren-functionarissen-consumer",
+  "version": "0.1.0",
+  "description": "consumer service to synchronise functionarissen data from leidingegevenden-databank",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lblod/gelinkt-notuleren-functionarissen-consumer.git"
+  },
+  "author": "dries.hugaerts@qmino.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lblod/gelinkt-notuleren-functionarissen-consumer/issues"
+  },
+  "homepage": "https://github.com/lblod/gelinkt-notuleren-functionarissen-consumer#readme"
+}

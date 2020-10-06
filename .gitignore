@@ -1,0 +1,7 @@
+# workspace
+.idea
+
+# npm
+package-lock.json
+/node-modules
+
