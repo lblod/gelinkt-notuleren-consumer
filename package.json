@@ -1,21 +1,21 @@
 {
-  "name": "gelinkt-notuleren-functionarissen-consumer",
+  "name": "gelinkt-notuleren-consumer",
   "version": "0.1.0",
-  "description": "consumer service to synchronise functionarissen data from leidingegevenden-databank",
+  "description": "consumer service to synchronise data from a producer stack",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lblod/gelinkt-notuleren-functionarissen-consumer.git"
+    "url": "git+https://github.com/lblod/gelinkt-notuleren-consumer.git"
   },
   "author": "dries.hugaerts@qmino.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lblod/gelinkt-notuleren-functionarissen-consumer/issues"
+    "url": "https://github.com/lblod/gelinkt-notuleren-consumer/issues"
   },
-  "homepage": "https://github.com/lblod/gelinkt-notuleren-functionarissen-consumer#readme",
+  "homepage": "https://github.com/lblod/gelinkt-notuleren-consumer#readme",
   "dependencies": {
     "@lblod/mu-auth-sudo": "^0.2.0",
     "fs-extra": "^9.0.1",

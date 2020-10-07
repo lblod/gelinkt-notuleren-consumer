@@ -1,6 +1,6 @@
 import { app, errorHandler } from 'mu';
 import fetch from 'node-fetch';
-import { INGEST_INTERVAL, SERVICE_NAME, SERVICE_VERSION } from './config';
+import { INGEST_INTERVAL, SERVICE_NAME, SERVICE_VERSION, TYPES } from './config';
 import { waitForDatabase } from './lib/database';
 import { getNextSyncTask, getRunningSyncTask, scheduleSyncTask, setTaskFailedStatus } from './lib/sync-task';
 
