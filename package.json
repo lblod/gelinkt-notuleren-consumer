@@ -18,6 +18,7 @@
   "homepage": "https://github.com/lblod/gelinkt-notuleren-functionarissen-consumer#readme",
   "dependencies": {
     "@lblod/mu-auth-sudo": "^0.2.0",
+    "fs-extra": "^9.0.1",
     "node-fetch": "^2.6.1"
   }
 }
