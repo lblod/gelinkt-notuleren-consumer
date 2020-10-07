@@ -158,3 +158,5 @@ The service makes 2 core assumptions that must be respected at all times:
 1. At any moment we know that the latest `ext:deltaUntil` timestamp on a task, either in failed/ongoing/success state,
    reflects the timestamp of the latest delta file that has been completly and successfully consumed
 2. Maximum 1 sync task is running at any moment in time
+
+#### This implementation is a configurable fork of [gelinkt-notuleren-mandatarissen-consumer](https://github.com/lblod/gelinkt-notuleren-mandatarissen-consumer)
