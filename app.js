@@ -1,6 +1,6 @@
 import { app, errorHandler } from 'mu';
 import fetch from 'node-fetch';
-import { INGEST_INTERVAL, SERVICE_NAME, SERVICE_VERSION, TYPES } from './config';
+import { INGEST_INTERVAL, SERVICE_NAME } from './config';
 import { waitForDatabase } from './lib/database';
 import { getNextSyncTask, getRunningSyncTask, scheduleSyncTask, setTaskFailedStatus } from './lib/sync-task';
 
@@ -16,7 +16,7 @@ waitForDatabase().then(async () => {
 });
 
 app.get('/', function(req, res) {
-  res.send(`Hello, you have reached ${SERVICE_NAME} v${SERVICE_VERSION}! I'm doing just fine ^^`);
+  res.send(`Hello, you have reached ${SERVICE_NAME}! I'm doing just fine ^^`);
 });
 
 function automatedIngestionScheduling() {
