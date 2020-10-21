@@ -75,7 +75,7 @@ to achieve this we can simple add a `INGEST_INTERVAL` env. variable
 
 The following environment variables are required:
 
-- `SERVICE_NAME`: consumer identifier. important as it is used to ensure persistence. [REQUIRED]
+- `SERVICE_NAME`: consumer identifier. important as it is used to ensure persistence. The identifier should be unique within the project. [REQUIRED]
 - `SYNC_BASE_URL`: base URL of the stack hosting the producer API (e.g. http://mandaten.lblod.info/)
 
 The following environment variables are optional:
