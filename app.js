@@ -26,6 +26,7 @@ function automatedIngestionScheduling() {
 }
 
 app.post('/schedule-ingestion', async function(req, res, next) {
+  //TODO: not clear why first scheduling and then checking for running tasks
   await scheduleSyncTask();
 
   const isRunning = await getRunningSyncTask();

@@ -11,6 +11,10 @@ const PUBLIC_GRAPH = process.env.PUBLIC_GRAPH || 'http://mu.semte.ch/graphs/publ
 const TMP_INGEST_GRAPH = process.env.TMP_INGEST_GRAPH || `http://mu.semte.ch/graphs/tmp-ingest-${SERVICE_NAME}`;
 const START_FROM_DELTA_TIMESTAMP = process.env.START_FROM_DELTA_TIMESTAMP;
 
+if(!SERVICE_NAME){
+  throw "SERVICE_NAME is required. Please provide one.";
+}
+
 // STATICS
 const SYNC_FILES_ENDPOINT = `${SYNC_BASE_URL}${SYNC_FILES_PATH}`;
 const DOWNLOAD_FILE_ENDPOINT = `${SYNC_BASE_URL}${DOWNLOAD_FILE_PATH}`;
