@@ -35,7 +35,7 @@ app.post('/schedule-ingestion', async function(req, res, next) {
     if (task) {
       console.log(`Start ingesting new delta files since ${task.since.toISOString()}`);
       try {
-        task.execute();
+        await task.execute();
         return res.status(202).end();
       } catch(e) {
         console.log(`Something went wrong while ingesting. Closing sync task with failure state.`);
