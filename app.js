@@ -40,7 +40,6 @@ app.post('/schedule-ingestion', async function(req, res, next) {
       } catch(e) {
         console.log(`Something went wrong while ingesting. Closing sync task with failure state.`);
         console.trace(e);
-        await task.closeWithFailure();
         return next(new Error(e));
       }
     } else {
