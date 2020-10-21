@@ -22,7 +22,7 @@ app.get('/', function(req, res) {
 function automatedIngestionScheduling() {
   console.log(`Scheduled ingestion at ${new Date().toISOString()}`);
   fetch('http://localhost/schedule-ingestion/', {method: 'POST'});
-  setTimeout(automatedIngestionScheduling, INGEST_INTERVAL)
+  setTimeout(automatedIngestionScheduling, INGEST_INTERVAL);
 }
 
 app.post('/schedule-ingestion', async function(req, res, next) {
