@@ -48,7 +48,7 @@ app.post('/schedule-ingestion', async function(req, res, next) {
     }
   } else {
     console.log('A sync task is already running. A new task is scheduled and will start when the previous task finishes.');
-    return res.status(409).end();
+    return res.status(409).end(); //TODO: don't we have a better one? it is not really an error is it?
   }
 });
 
