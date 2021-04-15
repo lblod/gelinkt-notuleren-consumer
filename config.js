@@ -10,6 +10,8 @@ const BATCH_SIZE = parseInt(process.env.BATCH_SIZE) || 100;
 const PUBLIC_GRAPH = process.env.PUBLIC_GRAPH || 'http://mu.semte.ch/graphs/public';
 const TMP_INGEST_GRAPH = process.env.TMP_INGEST_GRAPH || `http://mu.semte.ch/graphs/tmp-ingest-${SERVICE_NAME}`;
 const START_FROM_DELTA_TIMESTAMP = process.env.START_FROM_DELTA_TIMESTAMP;
+const DELTA_FILE_FOLDER = process.env.DELTA_FILE_FOLDER || '/tmp/';
+const KEEP_DELTA_FILES = process.env.KEEP_DELTA_FILES == 'true';
 
 if(!SERVICE_NAME){
   throw "SERVICE_NAME is required. Please provide one.";
@@ -30,4 +32,6 @@ export {
   TMP_INGEST_GRAPH,
   START_FROM_DELTA_TIMESTAMP,
   TYPES,
+  KEEP_DELTA_FILES,
+  DELTA_FILE_FOLDER
 };
