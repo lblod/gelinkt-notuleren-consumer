@@ -1,56 +1,45 @@
 import { app, errorHandler } from 'mu';
-import fetch from 'node-fetch';
-import { INGEST_INTERVAL, SERVICE_NAME } from './config';
+import { CronJob } from 'cron';
+import {
+  SERVICE_NAME,
+  INITIAL_SYNC_JOB_OPERATION,
+  CRON_PATTERN_DELTA_SYNC
+} from './config';
 import { waitForDatabase } from './lib/database';
-import { getNextSyncTask, getRunningSyncTask, scheduleSyncTask, setTaskFailedStatus } from './lib/sync-task';
-
-waitForDatabase().then(async () => {
-  const runningTask = await getRunningSyncTask();
-  if (runningTask) {
-    console.log(`Task <${runningTask.uri.value}> is still ongoing at startup. Updating its status to failed.`);
-    await setTaskFailedStatus(runningTask.uri.value);
-  }
-  if (INGEST_INTERVAL > 0) {
-    automatedIngestionScheduling();
-  }
-});
+import { cleanupJobs, getJobs } from './lib/utils';
+import { startInitialSync } from './lib/initial-sync/initial-sync';
+import { startDeltaSync } from './lib/delta-sync/delta-sync';
 
 app.get('/', function(req, res) {
-  res.send(`Hello, you have reached ${SERVICE_NAME}! I'm doing just fine ^^`);
+  res.send(`Hello, you have reached ${SERVICE_NAME}! I'm doing just fine :)`);
 });
 
-function automatedIngestionScheduling() {
-  console.log(`Scheduled ingestion at ${new Date().toISOString()}`);
-  fetch('http://localhost/schedule-ingestion/', {method: 'POST'});
-  setTimeout(automatedIngestionScheduling, INGEST_INTERVAL);
-}
+waitForDatabase(startInitialSync);
 
-app.post('/schedule-ingestion', async function(req, res, next) {
-  //TODO: not clear why first scheduling and then checking for running tasks
-  await scheduleSyncTask();
+new CronJob(CRON_PATTERN_DELTA_SYNC, async function() {
+  const now = new Date().toISOString();
+  console.info(`Delta sync triggered by cron job at ${now}`);
+  await startDeltaSync();
+}, null, true);
 
-  const isRunning = await getRunningSyncTask();
+/*
+ * ENDPOINTS CURRENTLY MEANT FOR DEBUGGING
+ */
 
-  if (!isRunning) {
-    const task = await getNextSyncTask();
-    if (task) {
-      console.log(`Start ingesting new delta files since ${task.since.toISOString()}`);
-      try {
-        await task.execute();
-        return res.status(202).end();
-      } catch(e) {
-        console.log(`Something went wrong while ingesting. Closing sync task with failure state.`);
-        console.trace(e);
-        return next(new Error(e));
-      }
-    } else {
-      console.log(`No scheduled sync task found. Did the insertion of a new task just fail?`);
-      return res.status(200).end();
-    }
-  } else {
-    console.log('A sync task is already running. A new task is scheduled and will start when the previous task finishes.');
-    return res.status(409).end(); //TODO: don't we have a better one? it is not really an error is it?
-  }
+app.post('/initial-sync-jobs', async function( _, res ){
+  startInitialSync();
+  res.send({ msg: 'Started initial sync job' });
+});
+
+app.delete('/initial-sync-jobs', async function( _, res ){
+  const jobs = await getJobs(INITIAL_SYNC_JOB_OPERATION);
+  await cleanupJobs(jobs);
+  res.send({ msg: 'Initial sync jobs cleaned' });
+});
+
+app.post('/delta-sync-jobs', async function( _, res ){
+  startDeltaSync();
+  res.send({ msg: 'Started delta sync job' });
 });
 
 app.use(errorHandler);
