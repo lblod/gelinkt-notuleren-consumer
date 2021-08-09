@@ -1,6 +1,7 @@
 // MANDATORY
+export const TYPES = require('/config/types.json');
 
-if(!process.env.SERVICE_NAME)
+if (!process.env.SERVICE_NAME)
   throw `Expected 'SERVICE_NAME' to be provided.`;
 export const SERVICE_NAME = process.env.SERVICE_NAME;
 
@@ -16,18 +17,25 @@ if(!process.env.INITIAL_SYNC_JOB_OPERATION)
   throw `Expected 'INITIAL_SYNC_JOB_OPERATION' to be provided.`;
 export const INITIAL_SYNC_JOB_OPERATION = process.env.INITIAL_SYNC_JOB_OPERATION;
 
+if (!process.env.INGEST_GRAPH)
+    throw `Expected 'INGEST_GRAPH' to be provided.`;
+export const INGEST_GRAPH = process.env.INGEST_GRAPH;
+
 // CONFIGURATION
 
+export const MU_SPARQL_ENDPOINT = process.env.MU_SPARQL_ENDPOINT;
 export const SYNC_BASE_URL = process.env.SYNC_BASE_URL;
 export const SYNC_FILES_PATH = process.env.SYNC_FILES_PATH || '/sync/files';
 export const DOWNLOAD_FILE_PATH = process.env.DOWNLOAD_FILE_PATH || '/files/:id/download';
 export const SYNC_DATASET_PATH = process.env.SYNC_DATASET_PATH || '/datasets';
 export const BATCH_SIZE = parseInt(process.env.BATCH_SIZE) || 100;
+export const BATCH_SIZE_FOR_GRAPH_MOVE = parseInt(process.env.BATCH_SIZE_FOR_GRAPH_MOVE) || 10;
 export const START_FROM_DELTA_TIMESTAMP = process.env.START_FROM_DELTA_TIMESTAMP;
 export const DELTA_FILE_FOLDER = process.env.DELTA_FILE_FOLDER || '/tmp/';
 export const KEEP_DELTA_FILES = process.env.KEEP_DELTA_FILES == 'true';
 export const DISABLE_DELTA_INGEST = process.env.DISABLE_DELTA_INGEST == 'true' ? true : false;
 export const DISABLE_INITIAL_SYNC = process.env.DISABLE_INITIAL_SYNC == 'true' ? true : false;
+export const DISABLE_INITIAL_SYNC_FIRST_INGEST = process.env.DISABLE_INITIAL_SYNC_FIRST_INGEST == 'true' ? true : false;
 export const WAIT_FOR_INITIAL_SYNC = process.env.WAIT_FOR_INITIAL_SYNC == 'false'? false: true;
 export const DUMPFILE_FOLDER = process.env.DUMPFILE_FOLDER || 'consumer/deltas';
 export const MU_CALL_SCOPE_ID_INITIAL_SYNC = process.env.MU_CALL_SCOPE_ID_INITIAL_SYNC || 'http://redpencil.data.gift/id/concept/muScope/deltas/consumer/initialSync';
@@ -38,7 +46,7 @@ export const MAX_DB_RETRY_ATTEMPTS = parseInt(process.env.MAX_DB_RETRY_ATTEMPTS 
 export const SLEEP_TIME_AFTER_FAILED_DB_OPERATION = parseInt(process.env.SLEEP_TIME_AFTER_FAILED_DB_OPERATION || 60000);
 
 // GRAPHS
-export const INGEST_GRAPH = process.env.INGEST_GRAPH || `http://mu.semte.ch/graphs/public`;
+export const PUBLIC_GRAPH = process.env.PUBLIC_GRAPH || `http://mu.semte.ch/graphs/public`;
 export const JOBS_GRAPH = process.env.JOBS_GRAPH || 'http://mu.semte.ch/graphs/system/jobs';
 
 // JOBS & TASKS
