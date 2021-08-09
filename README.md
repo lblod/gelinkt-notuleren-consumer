@@ -6,11 +6,16 @@ producer can be found [here](http://github.com/lblod/mandatendatabank-mandataris
 At regular intervals the consumer checks for new diff files and ingests the data found within. The data is ingested
 in the appropriate graphs according to the authorization rules.
 
+It does two things:
+- Initial sync by getting dump files to ingest. Happens on service startup, only once, and is mandatory
+- Delta sync at regular intervals where the consumer checks for new diff files and ingests the data
+  found within
+
 ## Tutorials
 
 ### Add the service to a stack
 
-1) Add the service to your `docker-compose.yml`:
+1) Add the service to your `docker-compose.yml`, e.g. for the syncing of mandatarissen.
 
     ```yaml
     consumer:
@@ -18,6 +23,10 @@ in the appropriate graphs according to the authorization rules.
       environment:
         SERVICE_NAME: 'your-custom-consumer-identifier' # replace with the desired consumer identifier
         SYNC_BASE_URL: 'http://base-sync-url # replace with link the application hosting the producer server
+        SYNC_FILES_PATH: '/sync/files'
+        SYNC_DATASET_SUBJECT: "http://data.lblod.info/datasets/delta-producer/dumps/MandatarissenCacheGraphDump"
+        INITIAL_SYNC_JOB_OPERATION: "http://redpencil.data.gift/id/jobs/concept/JobOperation/deltas/consumer/initialSync/mandatarissen"
+        JOB_CREATOR_URI: "http://data.lblod.info/services/id/mandatarissen-consumer-gelinkt-notuleren"
       volumes:
         - ./config/consumer/:/config/ # replace with path to types configuration
     ```
@@ -61,38 +70,32 @@ to achieve this we can simple add a `INGEST_INTERVAL` env. variable
      INGEST_INTERVAL: 60000 # each minute
 ```
 
-### API
-
-> **GET** `/`
->
-> simple "hello-world" endpoint, returns the current running version for the true geeks
-
-> **POST** `/schedule-ingestion`
->
-> Schedule and execute a sync task.
-
 ## Configuration
 
 The following environment variables are required:
 
 - `SERVICE_NAME`: consumer identifier. important as it is used to ensure persistence. The identifier should be unique within the project. [REQUIRED]
-- `SYNC_BASE_URL`: base URL of the stack hosting the producer API (e.g. http://mandaten.lblod.info/)
-
+- `SYNC_DATASET_SUBJECT`: subject used when fetching the dataset [REQUIRED]
+- `JOB_CREATOR_URI`: URL of the creator of the sync jobs [REQUIRED]
+- `INITIAL_SYNC_JOB_OPERATION`: Job operation of the sync job, used to describe the created jobs [REQUIRED]
+- `INGEST_GRAPH`: graph in which all insert changesets are ingested before these are moved to the organisation graphs.
 The following environment variables are optional:
 
+- `SYNC_BASE_URL`: base URL of the stack hosting the producer API
 - `SYNC_FILES_PATH (default: /sync/files)`: relative path to the endpoint to retrieve names of the diff files from
 - `DOWNLOAD_FILES_PATH (default: /files/:id/download)`: relative path to the endpoint to download a diff file
   from. `:id` will be replaced with the uuid of the file.
-- `INGEST_INTERVAL (in ms, default: -1)`: interval at which the consumer needs to sync data automatically. If negative,
-  sync can only be triggered manually via the API endpoint.
+- `CRON_PATTERN_DELTA_SYNC (default: 0 * * * * *)`: cron pattern at which the consumer needs to sync data automatically.
 - `START_FROM_DELTA_TIMESTAMP (ISO datetime, default: now)`: timestamp to start sync data from (e.g. "2020-07-05T13:57:
-  36.344Z")
-- `PUBLIC_GRAPH (default: http://mu.semte.ch/graphs/public)`: public graph in which all public data and sync tasks will
-  be ingested
-- `TMP_INGEST_GRAPH (default: http://mu.semte.ch/graphs/tmp-ingest-gelinkt-notuleren-mandatarissen-consumer)`: temporary
-  graph in which all insert changesets are ingested before they're moved to the appropriate graphs according to the
-  authorization rules.
-
+  36.344Z") Only makes sense when initial ingest hasn't run.
+- `BATCH_SIZE_FOR_GRAPH_MOVE`: moving data can be expensive, you can control the size of the batches to move around to organisation graphs
+- `DISABLE_INITIAL_SYNC (default: false)`: flag to disable initial sync
+- `DISABLE_INITIAL_SYNC_FIRST_INGEST (default: false)`: mainly for debugging purposes, you can skip step one of the ingestion.
+- `DISABLE_DELTA_INGEST (default: false)`: flag to disable data ingestion, for example while initializing the sync
+- `WAIT_FOR_INITIAL_SYNC (default: false)`: flag to not wait for initial ingestion (meant for debugging)
+- `BYPASS_MU_AUTH_FOR_EXPENSIVE_QUERIES (default: false)`: (see code where it is called) This has repercussions you should know of!
+- `DIRECT_DATABASE_ENDPOINT (default: http://virtuoso:8890/sparql)`: only used when BYPASS_MU_AUTH_FOR_EXPENSIVE_QUERIES is set to true
+- `KEEP_DELTA_FILES (default: false)`: if you want to keep the downloaded delta-files (ease of troubleshooting)
 ### Model
 
 #### Used prefixes
@@ -136,19 +139,14 @@ At regular intervals, the service will schedule a sync task. Execution of a task
 3. Download the content of each diff file
 4. Process each diff file in order
 
-During the processing of a diff file, the insert and delete changesets are processed in a different way
-
-**Insert changeset**
-Ingest the changeset in a temporary graph `TMP_INGEST_GRAPH`. Data cannot be ingested directly in the appropriate graph(
-s) since info to determine the correct graphs (e.g. the `rdf:type`) may still be missing.
+During the processing of a diff file, the insert and delete changesets are processed
 
 **Delete changeset**
-Apply a delete query triple per triple across all graphs (including the temporary graph)
+Apply a delete query triple per triple across all graphs
 
-At the end of each diff file processing, queries are executed to move data from the temporary graph to the appropriate
-graphs based on the `rdf:type` and authorization rules. This movement
-operation (`./lib/delta-file/moveTriplesFromTmpGraph()`) contains the most important part of the consumer service. If
-the application's authorization rules change, this function needs to be revisited.
+**Insert changeset**
+Ingest the changeset in the graph `INGEST_GRAPH`.
+
 
 If one file fails to be ingested, the remaining files in the queue are blocked since the files must always be handled in
 order.
@@ -158,5 +156,3 @@ The service makes 2 core assumptions that must be respected at all times:
 1. At any moment we know that the latest `ext:deltaUntil` timestamp on a task, either in failed/ongoing/success state,
    reflects the timestamp of the latest delta file that has been completly and successfully consumed
 2. Maximum 1 sync task is running at any moment in time
-
-#### This implementation is a configurable fork of [gelinkt-notuleren-mandatarissen-consumer](https://github.com/lblod/gelinkt-notuleren-mandatarissen-consumer)
