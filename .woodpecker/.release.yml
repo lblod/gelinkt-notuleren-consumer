@@ -2,7 +2,7 @@ steps:
   push-tagged-build:
     image: plugins/docker
     settings:
-      repo: lblod/ember-rdfa-editor
+      repo: lblod/gelinkt-notuleren-consumer
       tags: "${CI_COMMIT_TAG##v}"
       purge: true
     secrets: [ docker_username, docker_password ]
