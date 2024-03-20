@@ -1,6 +1,6 @@
 {
   "name": "gelinkt-notuleren-consumer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "consumer service to synchronise data from a producer stack",
   "main": "app.js",
   "scripts": {
